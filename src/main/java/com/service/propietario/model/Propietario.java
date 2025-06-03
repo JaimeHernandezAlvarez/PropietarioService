@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Propietario {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usuario_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "propietario_seq")
     @SequenceGenerator(name = "propietario_seq", sequenceName = "SEQ_PROPIETARIO", allocationSize = 1)
     @Column(name = "id_propietario")
     private Integer id;
@@ -32,6 +32,9 @@ public class Propietario {
 
     @Column(name = "telefono")
     private Integer telefono;
+
+    @Column(name = "id_usuario")
+    private Long usuario;
 
     @OneToMany(mappedBy = "propietario", cascade = CascadeType.ALL)
     @JsonManagedReference
