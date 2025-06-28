@@ -1,6 +1,8 @@
 package com.service.propietario.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
@@ -125,5 +127,17 @@ public class PropietarioControllerV2 {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping(value = "/propietarios/total", produces = MediaTypes.HAL_JSON_VALUE)
+    public EntityModel<Map<String, Long>> getTotalPropietarios() {
+        
+        long totalPropietarios = propietarioService.count();
+
+        Map<String, Long> resultado = new HashMap<>();
+        resultado.put("TotalPropietarios", totalPropietarios);
+        
+        return EntityModel.of(resultado,
+                linkTo(methodOn(PropietarioControllerV2.class).getTotalPropietarios()).withSelfRel());
     }
 }

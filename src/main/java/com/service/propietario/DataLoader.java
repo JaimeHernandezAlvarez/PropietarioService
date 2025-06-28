@@ -42,7 +42,7 @@ public class DataLoader implements CommandLineRunner{
                 animal.setEspecie(faker.animal().name());
                 animal.setNombre(faker.funnyName().name());
                 animal.setGenero(faker.gender().shortBinaryTypes());
-                animal.setEstado(faker.medical().symptoms());
+                animal.setEstado(faker.medicalProcedure().toString());
                 animales.add(animal);
                 animal.setPropietario(propietario);
             }

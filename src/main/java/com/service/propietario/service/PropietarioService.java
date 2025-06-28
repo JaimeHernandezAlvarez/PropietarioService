@@ -35,4 +35,9 @@ public class PropietarioService {
     public void delete(long id){
         propietarioRepository.deleteById(id);
     }
+
+    public long count(){
+        return propietarioRepository.count();
+    }
+
 }

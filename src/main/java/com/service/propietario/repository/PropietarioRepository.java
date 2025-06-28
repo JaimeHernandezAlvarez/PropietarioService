@@ -7,5 +7,5 @@ import com.service.propietario.model.Propietario;
 
 @Repository
 public interface PropietarioRepository extends JpaRepository<Propietario,Long>{
-
+    long count();
 }
