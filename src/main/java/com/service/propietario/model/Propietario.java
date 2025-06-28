@@ -31,7 +31,7 @@ public class Propietario {
     private Integer edad;
 
     @Column(name = "telefono")
-    private Integer telefono;
+    private String telefono;
 
     @Column(name = "id_usuario")
     private Long usuario;

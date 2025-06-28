@@ -8,10 +8,10 @@
 		<version>3.4.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.hospital-vm.cl</groupId>
-	<artifactId>hospital-vm</artifactId>
+	<groupId>com.service</groupId>
+	<artifactId>propietario</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Hospital V&amp;M</name>
+	<name>propietario</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
@@ -78,6 +78,11 @@
 			<groupId>com.oracle.database.security</groupId>
 			<artifactId>osdt_cert</artifactId>
 			<version>19.8.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.datafaker</groupId>
+			<artifactId>datafaker</artifactId>
+			<version>2.4.2</version>
 		</dependency>
 	</dependencies>
 

@@ -19,16 +19,16 @@ public class Animal {
     @Column(name = "id_animal")
     private Integer id;
 
-    @Column(name = "nombre_animal",length = 15)
+    @Column(name = "nombre_animal")
     private String nombre;
 
-    @Column(name = "especie",length = 15)
+    @Column(name = "especie")
     private String especie;
 
-    @Column(name = "genero",length = 1)
+    @Column(name = "genero")
     private String genero;
 
-    @Column(name = "estado_animal",length = 200)
+    @Column(name = "estado_animal")
     private String estado;
 
     @ManyToOne
