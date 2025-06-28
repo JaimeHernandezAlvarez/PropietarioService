@@ -34,7 +34,7 @@ public class Propietario {
     private String telefono;
 
     @Column(name = "id_usuario")
-    private Long usuario;
+    private int usuario;
 
     @OneToMany(mappedBy = "propietario", cascade = CascadeType.ALL)
     @JsonManagedReference
