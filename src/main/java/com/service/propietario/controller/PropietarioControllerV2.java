@@ -130,6 +130,8 @@ public class PropietarioControllerV2 {
     }
 
     @GetMapping(value = "/propietarios/total", produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "Operación exitosa")
+    @Operation(summary = "Total de propietarios", description = "Se da un numero total de la cantidad de propietarios que hay")
     public EntityModel<Map<String, Long>> getTotalPropietarios() {
         
         long totalPropietarios = propietarioService.count();
@@ -139,5 +141,20 @@ public class PropietarioControllerV2 {
         
         return EntityModel.of(resultado,
                 linkTo(methodOn(PropietarioControllerV2.class).getTotalPropietarios()).withSelfRel());
+    }
+
+    @GetMapping(value = "/propietarios/animal/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    @Operation(summary = "Buscar por animal", description = "Busca un propietario en base a la id del animal")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Operación exitosa"),
+        @ApiResponse(responseCode = "404", description = "Animal no encontrado")
+    })
+    public CollectionModel<EntityModel<Propietario>> getAllPropietariosPorAnimal(@PathVariable Integer id) {
+        List<EntityModel<Propietario>> propietarios = propietarioService.findByAnimalId(id).stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+
+        return CollectionModel.of(propietarios,
+                linkTo(methodOn(PropietarioControllerV2.class).getAllPropietariosPorAnimal(id)).withSelfRel());
     }
 }

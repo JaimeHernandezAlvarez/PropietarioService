@@ -36,8 +36,14 @@ public class PropietarioService {
         propietarioRepository.deleteById(id);
     }
 
+    //Obtener el total de propietarios
     public long count(){
         return propietarioRepository.count();
+    }
+
+    //Buscar dueño por animal
+    public List<Propietario> findByAnimalId(long id){
+        return propietarioRepository.findByAnimalesId(id);
     }
 
 }
