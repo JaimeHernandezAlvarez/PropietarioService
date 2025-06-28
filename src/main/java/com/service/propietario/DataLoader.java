@@ -15,7 +15,7 @@ import com.service.propietario.repository.PropietarioRepository;
 
 import net.datafaker.Faker;
 
-//@Profile("dev")
+@Profile("test")
 @Component
 public class DataLoader implements CommandLineRunner{
     @Autowired

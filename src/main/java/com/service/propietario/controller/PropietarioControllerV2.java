@@ -3,7 +3,7 @@ package com.service.propietario.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.service.propietario.assemblers.PropietarioModelAssembler;
 import com.service.propietario.model.Animal;
 import com.service.propietario.model.Propietario;
 import com.service.propietario.service.PropietarioService;
@@ -22,62 +24,69 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
-@RequestMapping("/api/v1/propietarios")
-@Tag(name = "Propietarios", description = "Operaciones relacionadas con las carreras")
-public class PropietarioController {
+@RequestMapping("/api/v2/propietarios")
+@Tag(name = "PropietariosV2", description = "Operaciones relacionadas con las carreras a traves de HATEOAS")
+public class PropietarioControllerV2 {
     @Autowired
     private PropietarioService propietarioService;
 
+    @Autowired
+    private PropietarioModelAssembler assembler;
 
-    @GetMapping
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Obtener todos los propietarios", description = "Obtiene una lista de todos los propietarios")
     @ApiResponse(responseCode = "200", description = "Operación exitosa")
-    public ResponseEntity<List<Propietario>> listar() {
-        List<Propietario> Propietarios = propietarioService.findAll();
-        if (Propietarios.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(Propietarios);
+    public CollectionModel<EntityModel<Propietario>> getAllPropietarios() {
+        List<EntityModel<Propietario>> propietarios = propietarioService.findAll().stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+
+        return CollectionModel.of(propietarios,
+                linkTo(methodOn(PropietarioControllerV2.class).getAllPropietarios()).withSelfRel());
     }
 
-    @PostMapping()
+    @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Crear un propietario", description = "Se crea un propietario en el repositorio")
     @ApiResponse(responseCode = "201", description = "Operación exitosa")
-    public ResponseEntity<Propietario> guardar(@RequestBody Propietario propietario){
+    public ResponseEntity<EntityModel<Propietario>> createPropietario(@RequestBody Propietario propietario) {
         Propietario nuevo = propietarioService.save(propietario);
         if(propietario.getAnimales() != null){
             for(Animal animal : propietario.getAnimales()){
                 animal.setPropietario(nuevo);
             }
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
+        return ResponseEntity
+                .created(linkTo(methodOn(PropietarioControllerV2.class).getPropietarioById(nuevo.getId())).toUri())
+                .body(assembler.toModel(nuevo));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Obtener un propietario", description = "Se obtiene un solo propietario en base a la id que se le da")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Operación exitosa"),
         @ApiResponse(responseCode = "404", description = "Propietario no encontrado")
     })
-    public ResponseEntity<Propietario> buscar(@PathVariable Integer id) {
-        try {
-            Propietario propietario = propietarioService.findById(id);
-            return ResponseEntity.ok(propietario);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    public EntityModel<Propietario> getPropietarioById(@PathVariable int id) {
+        Propietario propietario = propietarioService.findById(id);
+        return assembler.toModel(propietario);
     }
 
-    @PutMapping("/{id}")
+
+    @PutMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @Operation(summary = "Actualizar un propietario", description = "Se actualiza un solo propietario en base a la id que se le da")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Operación exitosa"),
         @ApiResponse(responseCode = "404", description = "Propietario no encontrado")
     })
-    public ResponseEntity<Propietario> actualizar(@PathVariable Integer id, @RequestBody Propietario propietario) {
+    public ResponseEntity<EntityModel<Propietario>> actualizar(@PathVariable Integer id, @RequestBody Propietario propietario) {
         try {
             Propietario existente = propietarioService.findById(id);
             existente.setId(id);
@@ -96,7 +105,8 @@ public class PropietarioController {
             }
 
             Propietario actualizado = propietarioService.save(existente);
-            return ResponseEntity.ok(actualizado);
+            return ResponseEntity
+                .ok(assembler.toModel(actualizado));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
